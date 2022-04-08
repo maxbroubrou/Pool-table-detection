@@ -1,19 +1,19 @@
-# PART 1 : Detect the pool table as a blob (inspired by https://stackoverflow.com/questions/41138000/fit-quadrilateral-tetragon-to-a-blob)
-# PART 2 : Detection of the 6 main lines surrounding the blob (using cv2.ximgproc.createFastLineDetector())
-# PART 3 : get the pool table 4 coordinates that are the lines intersection points
+# STEP 1 : Detect the pool table as a blob (inspired by https://stackoverflow.com/questions/41138000/fit-quadrilateral-tetragon-to-a-blob)
+# STEP 2 : Detection of the 6 main lines surrounding the blob (using cv2.ximgproc.createFastLineDetector())
+# STEP 3 : get the pool table 4 coordinates that are the lines intersection points
 
 import cv2
 import math
 import numpy as np
 
 # read and resize image
-img = cv2.imread("background.jpg")
+img = cv2.imread("images/background.jpg")
 img_copy = img.copy()
 img = cv2.resize(img, (640, 360))
-cv2.imshow("PART 0 - Original Image", img)
+cv2.imshow("STEP 0 - Original Image", img)
 
 
-# ---------------- PART 1 ----------------
+# ---------------- STEP 1 ----------------
 
 # blur image
 gaussian_blur = cv2.GaussianBlur(img, (7,7), 0)
@@ -27,17 +27,17 @@ hsv_higher = (86,255,255) # max values for green mask
 
 mask = cv2.inRange(hsv, hsv_lower, hsv_higher)
 green = cv2.bitwise_and(gaussian_blur, gaussian_blur, mask = mask)
-cv2.imshow("PART 1 - Green Table", green)
+cv2.imshow("STEP 1 - Green Table", green)
 
 # image processing to get a thresed blob
 gray = cv2.cvtColor(green, cv2.COLOR_RGB2GRAY)
 ret,thresh = cv2.threshold(gray,50,255,0)
 kernel = np.ones((5,5), np.uint8)
 dilate = cv2.dilate(thresh, kernel, iterations=1)
-cv2.imshow("PART 1 bis - Blob", dilate)
+cv2.imshow("STEP 1 bis - Blob", dilate)
 
 
-# ---------------- PART 2 ----------------
+# ---------------- STEP 2 ----------------
 
 main_line_number = 6
 lines = []
@@ -69,10 +69,10 @@ lines.sort(key = lambda x: x.length, reverse=True) #sort lines by length
 for line in lines[:main_line_number]:
     cv2.line(img, (line.x1, line.y1), (line.x2, line.y2), (255, 0, 255), 5)
 
-cv2.imshow("PART 2 - the 6 main lines detected", img)
+cv2.imshow("STEP 2 - the 6 main lines detected", img)
 
 
-# ---------------- PART 3 ----------------
+# ---------------- STEP 3 ----------------
 
 intersection_points = []
 index_to_remove = []
@@ -115,7 +115,7 @@ intersection_points = [intersection_points[a] for a in range(len(intersection_po
 for i in intersection_points:
     cv2.circle(img, (i[0],i[1]), 6, (2,0,255),-1)
 
-cv2.imshow("PART 3 - The 4 pool coordinates", img)
+cv2.imshow("STEP 3 - The 4 pool coordinates", img)
 print(intersection_points)
 
 cv2.waitKey(0)
